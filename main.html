@@ -22,6 +22,7 @@
         <table class="table table-bordered table-condensed">
             <tr><td style="width:60px;"><span class="badge badge-primary">名称</span></td><td><span id="elementname"></span></td></tr>
             <tr><td style="width:60px;"><span class="badge badge-primary">位置</span></td><td><span id="elementpos"></span></td></tr>
+            <tr><td style="width:60px;"><span class="badge badge-primary">状态</span></td><td><span id="elementstatus"></span></td></tr>
         </table>
     </div>
 
@@ -34,8 +35,8 @@
 
     </div>
     <div class="state1">
-        <button id="dd" onclick="active()">active</button>
-        <button id="add" onclick="noactive()">no active</button>
+        <button id="dd" onclick="active()">Active</button>
+        <button id="add" onclick="inactive()">Inactive</button>
         <button id="create0" onclick="create(0)">add0</button>
         <button id="create1" onclick="create(1)">add1</button>
         <button id="create2" onclick="create(2)">add2</button>
@@ -44,12 +45,14 @@
         <button id="create5" onclick="create(5)">add5</button>
         <button id="create6" onclick="create(6)">add6</button>
         <button id="create7" onclick="create(7)">add7</button>
+        <button onclick="alert(Node[0])">n</button>
     </div>
 
 <script src="js/bootstrap.min.js"></script>
 <script>
 //node类
 nodenum=0;
+nodelist={};
 var Node={
 
     createNew:function(type){
@@ -66,6 +69,9 @@ var Node={
             $("#background").append(htmltext);
             nodenum++;
         };
+
+        console.log(node);
+
         return node;
     }
 };
@@ -129,10 +135,14 @@ $('body').on('mousedown','.btn',function(e){
     function active(){
         selectelement.removeClass("btn btn-lg btn-outline-primary node");
         selectelement.addClass("btn btn-lg btn-outline-primary node active");
+        $("#elementstatus").text("Active");
     }
-    function noactive(){
+    function inactive(){
         selectelement.removeClass("btn btn-lg btn-outline-primary node active");
         selectelement.addClass("btn btn-lg btn-outline-primary node");
+        $("#elementstatus").text("Inactive");
+        selectelement.attr('id')
+        find
     }
 </script>
 
