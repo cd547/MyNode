@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-<style>
-    .node {position: absolute;}
-</style>
+    <style>
+        .node {position: absolute;}
+    </style>
 
 
     <script src="js/jquery-3.3.1.min.js"></script>
@@ -22,7 +22,31 @@
         <table class="table table-bordered table-condensed">
             <tr><td style="width:60px;"><span class="badge badge-primary">名称</span></td><td><span id="elementname"></span></td></tr>
             <tr><td style="width:60px;"><span class="badge badge-primary">位置</span></td><td><span id="elementpos"></span></td></tr>
-            <tr><td style="width:60px;"><span class="badge badge-primary">状态</span></td><td><span id="elementstatus"></span></td></tr>
+            <tr><td style="width:60px;"><span class="badge badge-primary">状态</span></td>
+                <td><span id="elementstatus">NULL</span>
+                    <button class="btn btn-sm btn-primary" id="setactive">Active</button>
+                    <button class="btn btn-sm btn-secondary" id="setinactive">Inactive</button>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px;"><span class="badge badge-primary">类型</span></td>
+                <td>
+                    <span id="elementtype">
+                    <select id="type" onchange="changetype()">
+                        <option value="-1">Null</option>
+                        <option value="primary">primary</option>
+                        <option value="secondary">secondary</option>
+                        <option value="success">success</option>
+                        <option value="danger">danger</option>
+                        <option value="warning">warning</option>
+                        <option value="info">info</option>
+                        <option value="light">light</option>
+                        <option value="dark">dark</option>
+                    </select>
+                    </span>
+                </td>
+            </tr>
+
         </table>
     </div>
 
@@ -31,77 +55,114 @@
 
 
 
-    <div class="state">
+<div class="state">
 
-    </div>
-    <div class="state1">
-        <button id="dd" onclick="active()">Active</button>
-        <button id="add" onclick="inactive()">Inactive</button>
-        <button id="create0" onclick="create(0)">add0</button>
-        <button id="create1" onclick="create(1)">add1</button>
-        <button id="create2" onclick="create(2)">add2</button>
-        <button id="create3" onclick="create(3)">add3</button>
-        <button id="create4" onclick="create(4)">add4</button>
-        <button id="create5" onclick="create(5)">add5</button>
-        <button id="create6" onclick="create(6)">add6</button>
-        <button id="create7" onclick="create(7)">add7</button>
-        <button onclick="alert(Node[0])">n</button>
-    </div>
+</div>
+<div class="state1">
+    <button id="dd" onclick="active()">Active</button>
+    <button id="add" onclick="inactive()">Inactive</button>
+    <button id="create0" onclick="create(0)">add0</button>
+    <button onclick="alert(nodelist.length)">n</button>
+</div>
 
 <script src="js/bootstrap.min.js"></script>
 <script>
-//node类
-nodenum=0;
-nodelist={};
-var Node={
+    //node类
+    nodenum=0;
+    nodelist=new Array();
 
-    createNew:function(type){
-        //
-        var node={};
-        node.id="node"+nodenum;
-        node.active=false;
-        node.position=[0,0];
-        node.content=node.id;
-        var types=["primary","secondary","success","danger","warning","info","light","dark"];
-        node.type=types[type];
-        node.create=function(){
-            var htmltext="<button id="+node.id+" type=\"button\" class=\"btn btn-lg btn-outline-"+node.type+" node\">"+node.content+"</button>";
-            $("#background").append(htmltext);
-            nodenum++;
-        };
+    var Node={
 
-        console.log(node);
+        createNew:function(type){
+            //
+            var node={};
+            node.id="node"+nodenum;
+            node.active=false;
+            node.position=[0,0];
+            node.content=node.id;
+            var types=["primary","secondary","success","danger","warning","info","light","dark"];
+            node.type=types[type];
+            node.create=function(){
+                var htmltext="<button id="+node.id+" type=\"button\" class=\"btn btn-lg btn-outline-"+node.type+" node\">"+node.content+"</button>";
+                $("#background").append(htmltext);
+                nodelist[nodenum]=node;
+                nodenum++;
+            };
+            //console.log(nodelist);
+            return node;
+        },
+        setnodetype:function(id,type){
+            nodelist[id].type=type;
+            this.drawnodeupdate(id);
+        },
+        setnodeactive:function(id,active){
+            nodelist[id].active=active;
+            this.drawnodeupdate(id);
+        },
+        setnodeposition:function(id,x,y){
+            nodelist[id].position=[x,y];
+            this.drawnodeupdate(id);
+        },
+        drawnodeupdate:function(id)
+        {
+            var isactive=nodelist[id].active?" active":"";
+            $("#node"+id).attr("class","");
+            $("#node"+id).attr("class","btn btn-lg btn-outline-"+nodelist[id].type+" node"+isactive);
+            var css = {
+                left:nodelist[id].position[0]+"px",
+                top:nodelist[id].position[1]+"px"
+            };
+            $("#node"+id).css(css);
 
-        return node;
+
+
+        }
+
+    };
+
+
+    function create(type)
+    {
+        var newnode=Node.createNew(type);
+        newnode.create();
     }
-};
-
-
-function create(type)
-{
-    var newnode=Node.createNew(type);
-    newnode.create();
-}
+    function changetype()
+    {
+        //alert($("#type").val());
+        Node.setnodetype(selectnodenum,$("#type").val());
+    }
     //
     var selectelement=null;
+    var selectnode={};
+    var selectnodenum=null;
     //声明需要用到的变量
     var mx = 0,my = 0;      //鼠标x、y轴坐标（相对于left，top）
     var dx = 0,dy = 0;      //对话框坐标（同上）
     var isDraging = false;      //不可拖动
 
-$('body').on('mousedown','.btn',function(e){
-    selectelement=$(this);
-    $("#elementname").text(this.id);
-    $("#elementpos").text("X="+$(this).position().left+",Y="+$(this).position().top);
+    $('body').on('mousedown','.node',function(e){
+        selectelement=$(this);
 
-    e = e || window.event;
-    mx = e.pageX;     //点击时鼠标X坐标
-    my = e.pageY;     //点击时鼠标Y坐标
-    dx = selectelement.offset().left;
-    dy = selectelement.offset().top;
-    isDraging = true;      //标记对话框可拖动
-    $('.state').text("true");
-});
+        selectnodenum=this.id.replace("node","");//获取node的id数字
+        // console.log(Node.getnodebyId(getnodenum));
+        selectnode=nodelist[selectnodenum];
+        console.log(nodelist[selectnodenum]);
+
+
+        e = e || window.event;
+        mx = e.pageX;     //点击时鼠标X坐标
+        my = e.pageY;     //点击时鼠标Y坐标
+        dx = selectelement.offset().left;
+        dy = selectelement.offset().top;
+        //Node.setnodeposition(selectnodenum,dx,dy);
+        isDraging = true;      //标记对话框可拖动
+        $('.state').text("true");
+        //侧边栏显示数据
+        $("#elementname").text(selectnode.id);
+        $("#elementpos").text("X="+nodelist[selectnodenum].position[0]+",Y="+nodelist[selectnodenum].position[1]);
+        $("#elementstatus").text(nodelist[selectnodenum].active?"Active":"Inactive");
+        $("#type").val(nodelist[selectnodenum].type);
+    });
 
     $('body').on('mousemove','#background',function(e) {
         var e = e || window.event;
@@ -121,8 +182,9 @@ $('body').on('mousedown','.btn',function(e){
             moveX = Math.min(Math.max(0,moveX),maxX);     //X轴可拖动范围
             moveY = Math.min(Math.max(0,moveY),maxY);     //Y轴可拖动范围
             //重新设置对话框的left、top
-            selectelement.css({"left":moveX + 'px',"top":moveY + 'px'});
-            $("#elementpos").text("X="+moveX.toFixed(0)+",Y="+moveY.toFixed(0));
+            //selectelement.css({"left":moveX + 'px',"top":moveY + 'px'});
+            Node.setnodeposition(selectnodenum,moveX.toFixed(0),moveY.toFixed(0));
+            $("#elementpos").text("X="+nodelist[selectnodenum].position[0]+",Y="+nodelist[selectnodenum].position[1]);
         };
     });
 
@@ -130,19 +192,25 @@ $('body').on('mousedown','.btn',function(e){
         //selectelement=$(this);
         isDraging = false;
         $('.state').text("false");
+        //update
+
+    });
+
+    $('body').on('mousedown','#setactive',function() {
+        active()
+    });
+
+    $('body').on('mousedown','#setinactive',function() {
+        inactive();
     });
 
     function active(){
-        selectelement.removeClass("btn btn-lg btn-outline-primary node");
-        selectelement.addClass("btn btn-lg btn-outline-primary node active");
-        $("#elementstatus").text("Active");
+        Node.setnodeactive(selectnodenum,true);
+        $("#elementstatus").text(nodelist[selectnodenum].active?"Active":"Inactive");
     }
     function inactive(){
-        selectelement.removeClass("btn btn-lg btn-outline-primary node active");
-        selectelement.addClass("btn btn-lg btn-outline-primary node");
-        $("#elementstatus").text("Inactive");
-        selectelement.attr('id')
-        find
+        Node.setnodeactive(selectnodenum,false);
+        $("#elementstatus").text(nodelist[selectnodenum].active?"Active":"Inactive");
     }
 </script>
 
