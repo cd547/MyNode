@@ -20,6 +20,8 @@
     </div>
     <div class="col-md-3">
         <table class="table table-bordered table-condensed">
+
+            <tr><td style="width:60px;"><span class="badge badge-primary">NodeID</span></td><td><span id="elementid"></span></td></tr>
             <tr><td style="width:60px;"><span class="badge badge-primary">名称</span></td><td><span id="elementname"></span></td></tr>
             <tr><td style="width:60px;"><span class="badge badge-primary">位置</span></td><td><span id="elementpos"></span></td></tr>
             <tr><td style="width:60px;"><span class="badge badge-primary">状态</span></td>
@@ -51,18 +53,12 @@
     </div>
 
 </div>
-
-
-
-
-<div class="state">
+<div class="state" style="min-height: 30px;">
 
 </div>
 <div class="state1">
-    <button id="dd" onclick="active()">Active</button>
-    <button id="add" onclick="inactive()">Inactive</button>
-    <button id="create0" onclick="create(0)">add0</button>
-    <button onclick="alert(nodelist.length)">n</button>
+    <button id="create0" onclick="create(0)">添加节点</button>
+    <button onclick="alert(nodelist.length)">节点个数</button>
 </div>
 
 <script src="js/bootstrap.min.js"></script>
@@ -77,6 +73,7 @@
             //
             var node={};
             node.id="node"+nodenum;
+            node.name="node"+nodenum;
             node.active=false;
             node.position=[0,0];
             node.content=node.id;
@@ -109,6 +106,7 @@
             $("#node"+id).attr("class","");
             $("#node"+id).attr("class","btn btn-lg btn-outline-"+nodelist[id].type+" node"+isactive);
             var css = {
+                //css
                 left:nodelist[id].position[0]+"px",
                 top:nodelist[id].position[1]+"px"
             };
@@ -158,10 +156,7 @@
         isDraging = true;      //标记对话框可拖动
         $('.state').text("true");
         //侧边栏显示数据
-        $("#elementname").text(selectnode.id);
-        $("#elementpos").text("X="+nodelist[selectnodenum].position[0]+",Y="+nodelist[selectnodenum].position[1]);
-        $("#elementstatus").text(nodelist[selectnodenum].active?"Active":"Inactive");
-        $("#type").val(nodelist[selectnodenum].type);
+        showattr(selectnode);
     });
 
     $('body').on('mousemove','#background',function(e) {
@@ -184,7 +179,7 @@
             //重新设置对话框的left、top
             //selectelement.css({"left":moveX + 'px',"top":moveY + 'px'});
             Node.setnodeposition(selectnodenum,moveX.toFixed(0),moveY.toFixed(0));
-            $("#elementpos").text("X="+nodelist[selectnodenum].position[0]+",Y="+nodelist[selectnodenum].position[1]);
+            showattr(selectnode);
         };
     });
 
@@ -197,20 +192,27 @@
     });
 
     $('body').on('mousedown','#setactive',function() {
-        active()
+        Node.setnodeactive(selectnodenum,true);
+        showattr(selectnode);
     });
 
     $('body').on('mousedown','#setinactive',function() {
+        Node.setnodeactive(selectnodenum,false);
         inactive();
     });
 
-    function active(){
-        Node.setnodeactive(selectnodenum,true);
-        $("#elementstatus").text(nodelist[selectnodenum].active?"Active":"Inactive");
-    }
-    function inactive(){
-        Node.setnodeactive(selectnodenum,false);
-        $("#elementstatus").text(nodelist[selectnodenum].active?"Active":"Inactive");
+    function showattr(node)
+    {
+        //id
+        $("#elementid").text(node.id);
+        //名称
+        $("#elementname").text(node.name);
+        //位置
+        $("#elementpos").text("X="+node.position[0]+",Y="+node.position[1]);
+        //状态
+        $("#elementstatus").text(node.active?"Active":"Inactive");
+        //类型
+        $("#type").val(node.type);
     }
 </script>
 
