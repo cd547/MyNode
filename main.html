@@ -6,25 +6,34 @@
     <style>
         .node {position: absolute;}
     </style>
-
-
     <script src="js/jquery-3.3.1.min.js"></script>
-
     <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
 <body>
-
 <div class="row" >
-    <div class="col-md-9" id="background" style="min-height: 500px;background-color: #cccccc;">
-
-    </div>
+    <div class="col-md-9" id="background" style="min-height: 500px;background-color: #cccccc;"></div>
     <div class="col-md-3">
         <table class="table table-bordered table-condensed">
-
-            <tr><td style="width:60px;"><span class="badge badge-primary">NodeID</span></td><td><span id="elementid"></span></td></tr>
-            <tr><td style="width:60px;"><span class="badge badge-primary">名称</span></td><td><span id="elementname"></span></td></tr>
-            <tr><td style="width:60px;"><span class="badge badge-primary">位置</span></td><td><span id="elementpos"></span></td></tr>
-            <tr><td style="width:60px;"><span class="badge badge-primary">状态</span></td>
+            <tr>
+                <td style="width:60px;"><span class="badge badge-primary">NodeID</span></td><td><span id="elementid"></span></td>
+            </tr>
+            <tr>
+                <td style="width:60px;"><span class="badge badge-primary">名称</span></td>
+                <td>
+                    <div class="input-group input-group-sm mb-3">
+                        <input id="elementname" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                        <div class="input-group-prepend">
+                            <button id="changnamebtn" class="input-group-text" id="inputGroup-sizing-sm">修改</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:60px;"><span class="badge badge-primary">位置</span></td>
+                <td><span id="elementpos"></span></td>
+            </tr>
+            <tr>
+                <td style="width:60px;"><span class="badge badge-primary">状态</span></td>
                 <td><span id="elementstatus">NULL</span>
                     <button class="btn btn-sm btn-primary" id="setactive">Active</button>
                     <button class="btn btn-sm btn-secondary" id="setinactive">Inactive</button>
@@ -33,34 +42,32 @@
             <tr>
                 <td style="width:60px;"><span class="badge badge-primary">类型</span></td>
                 <td>
-                    <span id="elementtype">
-                    <select id="type" onchange="changetype()">
+                    <select id="type" class="form-control">
                         <option value="-1">Null</option>
-                        <option value="primary">primary</option>
-                        <option value="secondary">secondary</option>
-                        <option value="success">success</option>
-                        <option value="danger">danger</option>
-                        <option value="warning">warning</option>
-                        <option value="info">info</option>
-                        <option value="light">light</option>
-                        <option value="dark">dark</option>
+                        <option value="primary" class="btn-primary">primary</option>
+                        <option value="secondary" class="btn-secondary">secondary</option>
+                        <option value="success" class="btn-success">success</option>
+                        <option value="danger" class="btn-danger">danger</option>
+                        <option value="warning" class="btn-warning">warning</option>
+                        <option value="info" class="btn-info">info</option>
+                        <option value="light" class="btn-light">light</option>
+                        <option value="dark" class="btn-dark">dark</option>
                     </select>
-                    </span>
                 </td>
             </tr>
-
+            <tr>
+                <td style="width:60px;"><span class="badge badge-primary">尺寸</span></td>
+                <td><span id="elementsize">Width:NULL height:NULL</span></td>
+            </tr>
         </table>
     </div>
-
 </div>
-<div class="state" style="min-height: 30px;">
-
-</div>
+<div class="state" style="min-height: 30px;"></div>
 <div class="state1">
-    <button id="create0" onclick="create(0)">添加节点</button>
-    <button onclick="alert(nodelist.length)">节点个数</button>
+    <button id="createnode" class="btn btn-sm btn-primary">添加节点</button>
+    <button class="btn btn-sm btn-primary" onclick="alert(nodelist.length)">节点个数</button>
+    <button id="getcent_btn" class="btn btn-sm btn-primary">节点位置</button>
 </div>
-
 <script src="js/bootstrap.min.js"></script>
 <script>
     //node类
@@ -76,12 +83,15 @@
             node.name="node"+nodenum;
             node.active=false;
             node.position=[0,0];
+            node.size=[0,0];
             node.content=node.id;
             var types=["primary","secondary","success","danger","warning","info","light","dark"];
             node.type=types[type];
             node.create=function(){
-                var htmltext="<button id="+node.id+" type=\"button\" class=\"btn btn-lg btn-outline-"+node.type+" node\">"+node.content+"</button>";
+                var htmltext="<div id="+node.id+"  class=\"btn btn-lg btn-outline-"+node.type+" node\">"+node.content+"</div>";
                 $("#background").append(htmltext);
+                node.size[0] = $("#"+node.id).width();
+                node.size[1] = $("#"+node.id).height();
                 nodelist[nodenum]=node;
                 nodenum++;
             };
@@ -100,6 +110,12 @@
             nodelist[id].position=[x,y];
             this.drawnodeupdate(id);
         },
+        setnodename:function(id,name){
+            nodelist[id].name=name;
+            this.drawnodeupdate(id);
+            nodelist[id].size[0] = parseInt($("#node"+id).width());
+            nodelist[id].size[1] = parseInt($("#node"+id).height());
+        },
         drawnodeupdate:function(id)
         {
             var isactive=nodelist[id].active?" active":"";
@@ -111,25 +127,11 @@
                 top:nodelist[id].position[1]+"px"
             };
             $("#node"+id).css(css);
-
-
-
+            $("#node"+id).text(nodelist[id].name);
         }
-
     };
 
-
-    function create(type)
-    {
-        var newnode=Node.createNew(type);
-        newnode.create();
-    }
-    function changetype()
-    {
-        //alert($("#type").val());
-        Node.setnodetype(selectnodenum,$("#type").val());
-    }
-    //
+    //全局变量
     var selectelement=null;
     var selectnode={};
     var selectnodenum=null;
@@ -137,15 +139,13 @@
     var mx = 0,my = 0;      //鼠标x、y轴坐标（相对于left，top）
     var dx = 0,dy = 0;      //对话框坐标（同上）
     var isDraging = false;      //不可拖动
-
+//事件
     $('body').on('mousedown','.node',function(e){
         selectelement=$(this);
-
         selectnodenum=this.id.replace("node","");//获取node的id数字
         // console.log(Node.getnodebyId(getnodenum));
         selectnode=nodelist[selectnodenum];
         console.log(nodelist[selectnodenum]);
-
 
         e = e || window.event;
         mx = e.pageX;     //点击时鼠标X坐标
@@ -167,7 +167,6 @@
             var moveX = dx + x - mx;      //移动后对话框新的left值
             var moveY = dy + y - my;      //移动后对话框新的top值
             //设置拖动范围
-
             var dialogW = selectelement.width();
             var dialogH = selectelement.height();
             var pageW = $("#background").width()-0.5*dialogW+10;
@@ -190,31 +189,79 @@
         //update
 
     });
-
+//节点状态激活
     $('body').on('mousedown','#setactive',function() {
         Node.setnodeactive(selectnodenum,true);
         showattr(selectnode);
     });
-
+    //节点状态未激活
     $('body').on('mousedown','#setinactive',function() {
         Node.setnodeactive(selectnodenum,false);
-        inactive();
+        showattr(selectnode);
     });
+    //修改节点名称
+    $('body').on('mousedown','#changnamebtn',function() {
+        changename(selectnodenum,$("#elementname").val());
+        showattr(selectnode);
+    });
+    //修改几点类型
+    $('body').on('change','#type',function() {
+        changetype(selectnodenum,$("#type").val());
+        showattr(selectnode);
+    });
+    //获取位置
+    $('body').on('mousedown','#getcent_btn',function() {
+        getcent(selectnode);
+        showattr(selectnode);
+    });
+    //添加
+    $('body').on('mousedown','#createnode',function() {
+        create(0);
+        showattr(selectnode);
+    });
+    //功能
+    function create(type)
+    {
+        var newnode=Node.createNew(type);
+        newnode.create();
+    }
+    function changetype(nodenum,typevalue)
+    {
+        //alert($("#type").val());
+        Node.setnodetype(nodenum,typevalue);
+    }
+    //修改名字
+    function changename(nodenum,newname)
+    {
+        Node.setnodename(nodenum,newname);
+    }
 
     function showattr(node)
     {
         //id
         $("#elementid").text(node.id);
         //名称
-        $("#elementname").text(node.name);
+        $("#elementname").val(node.name);
         //位置
         $("#elementpos").text("X="+node.position[0]+",Y="+node.position[1]);
         //状态
         $("#elementstatus").text(node.active?"Active":"Inactive");
         //类型
         $("#type").val(node.type);
+        //尺寸
+        $("#elementsize").text("Width:"+node.size[0]+" Height:"+node.size[1]);
+    }
+    function getcent(varnode)
+    {
+        var left = varnode.position[0];
+        var top = varnode.position[1];
+        var w=varnode.size[0];
+        var h=varnode.size[1];
+        console.log("left:"+left+" top:"+top+" w: "+w+" h:"+h);
+        var centx=parseInt(left)+parseInt(w/2);
+        var centy=parseInt(top)+parseInt(h/2);
+        console.log("x="+centx+" y="+centy);
     }
 </script>
-
 </body>
 </html>
