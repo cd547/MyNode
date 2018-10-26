@@ -67,6 +67,7 @@
     <button id="createnode" class="btn btn-sm btn-primary">添加节点</button>
     <button class="btn btn-sm btn-primary" onclick="alert(nodelist.length)">节点个数</button>
     <button id="getcent_btn" class="btn btn-sm btn-primary">节点位置</button>
+    <button id="link" class="btn btn-sm btn-primary">连接</button>
 </div>
 <script src="js/bootstrap.min.js"></script>
 <script>
@@ -88,7 +89,7 @@
             var types=["primary","secondary","success","danger","warning","info","light","dark"];
             node.type=types[type];
             node.create=function(){
-                var htmltext="<div id="+node.id+"  class=\"btn btn-lg btn-outline-"+node.type+" node\">"+node.content+"</div>";
+                var htmltext="<div id="+node.id+"  class=\"btn btn-lg btn-outline-"+node.type+" node\" style=\" z-index:"+parseInt(nodenum+1)+"\">"+node.content+"</div>";
                 $("#background").append(htmltext);
                 node.size[0] = $("#"+node.id).width();
                 node.size[1] = $("#"+node.id).height();
@@ -219,6 +220,11 @@
         create(0);
         showattr(selectnode);
     });
+    //连线
+    $('body').on('mousedown','#link',function() {
+       link();
+    });
+
     //功能
     function create(type)
     {
@@ -251,8 +257,10 @@
         //尺寸
         $("#elementsize").text("Width:"+node.size[0]+" Height:"+node.size[1]);
     }
+
     function getcent(varnode)
     {
+        var cent=[0,0];
         var left = varnode.position[0];
         var top = varnode.position[1];
         var w=varnode.size[0];
@@ -261,6 +269,22 @@
         var centx=parseInt(left)+parseInt(w/2);
         var centy=parseInt(top)+parseInt(h/2);
         console.log("x="+centx+" y="+centy);
+        return cent=[centx,centy];
+    }
+
+    function link()
+    {
+        $("#link"+nodelist[0].id+nodelist[1].id).remove();
+        var p1=getcent(nodelist[0]);
+        var p2=getcent(nodelist[1]);
+        var left=p1[0]>p2[0]?p2[0]:p1[0];
+        left+=16;
+        var top=p1[1]>p2[1]?p2[1]:p1[1];
+        top+=8;
+        var w=Math.abs(p1[0]-p2[0]);
+        var h=Math.abs(p1[1]-p2[1]);
+        var htmltext="<div id=\"link"+nodelist[0].id+nodelist[1].id+"\" style=\"position: absolute;top:"+top+"px;left:"+left+"px;width:"+w+"px;height:"+h+"px; background-color:rgba(204,204,204,0.1);border-color:#3366ff #3366ff transparent transparent;border-style:solid solid dashed dashed;z-index: 0\"></div>";
+        $("#background").append(htmltext);
     }
 </script>
 </body>
