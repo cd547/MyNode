@@ -13,14 +13,14 @@
 <div class="row" >
     <div class="col-md-9" id="background" style="min-height: 500px;background-color: #cccccc;"></div>
     <div class="col-md-3">
-        <table class="table table-bordered table-condensed">
+        <table class="table table-bordered table-condensed" style="font-size: 13px;">
             <tr>
-                <td style="width:60px;"><span class="badge badge-primary">NodeID</span></td><td><span id="elementid"></span></td>
+                <td style="width:60px;padding: 5;"><strong>NodeID</strong></td><td><span id="elementid"></span></td>
             </tr>
             <tr>
-                <td style="width:60px;"><span class="badge badge-primary">名称</span></td>
+                <td style="width:60px;padding: 5;"><strong>名称</strong></td>
                 <td>
-                    <div class="input-group input-group-sm mb-3">
+                    <div class="input-group input-group-sm mb-1">
                         <input id="elementname" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
                         <div class="input-group-prepend">
                             <button id="changnamebtn" class="input-group-text" id="inputGroup-sizing-sm">修改</button>
@@ -29,20 +29,21 @@
                 </td>
             </tr>
             <tr>
-                <td style="width:60px;"><span class="badge badge-primary">位置</span></td>
+                <td style="width:60px;padding: 5;"><strong>位置</strong></td>
                 <td><span id="elementpos"></span></td>
             </tr>
             <tr>
-                <td style="width:60px;"><span class="badge badge-primary">状态</span></td>
-                <td><span id="elementstatus">NULL</span>
+                <td style="width:60px;padding: 5;"><strong>状态</strong></td>
+                <td>
+                <strong id="elementstatus">NULL</strong>
                     <button class="btn btn-sm btn-primary" id="setactive">Active</button>
                     <button class="btn btn-sm btn-secondary" id="setinactive">Inactive</button>
                 </td>
             </tr>
             <tr>
-                <td style="width:60px;"><span class="badge badge-primary">类型</span></td>
+                <td style="width:60px;padding: 5;"><strong>类型</strong></td>
                 <td>
-                    <select id="type" class="form-control">
+                    <select id="type" class="form-control" style="font-size: 13px;">
                         <option value="-1">Null</option>
                         <option value="primary" class="btn-primary">primary</option>
                         <option value="secondary" class="btn-secondary">secondary</option>
@@ -56,8 +57,30 @@
                 </td>
             </tr>
             <tr>
-                <td style="width:60px;"><span class="badge badge-primary">尺寸</span></td>
+                <td style="width:60px;padding: 5;"><strong>尺寸</strong></td>
                 <td><span id="elementsize">Width:NULL height:NULL</span></td>
+            </tr>
+            <tr>
+                <td style="width:60px;padding: 5;"><strong>下节点</strong></td>
+                <td>
+
+                            <button id="shownextnodes" class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                节点
+                            </button>
+                            <br/>
+
+                            <div class="collapse" id="collapseExample" style="margin-top: 5px">
+                                <div id="nextnodes" class="btn-group-vertical btn-group-sm" role="group" aria-label="Vertical button group">
+
+                                </div>
+
+                            </div>
+
+
+
+
+
+                </td>
             </tr>
         </table>
     </div>
@@ -86,13 +109,14 @@
             node.position=[0,0];
             node.size=[0,0];
             node.content=node.id;
+            node.nextnodes=[];
             var types=["primary","secondary","success","danger","warning","info","light","dark"];
             node.type=types[type];
             node.create=function(){
                 var htmltext="<div id="+node.id+"  class=\"btn btn-lg btn-outline-"+node.type+" node\" style=\" z-index:"+parseInt(nodenum+1)+"\">"+node.content+"</div>";
                 $("#background").append(htmltext);
-                node.size[0] = $("#"+node.id).width();
-                node.size[1] = $("#"+node.id).height();
+                node.size[0] = parseInt($("#"+node.id).width());
+                node.size[1] = parseInt($("#"+node.id).height());
                 nodelist[nodenum]=node;
                 nodenum++;
             };
@@ -140,13 +164,13 @@
     var mx = 0,my = 0;      //鼠标x、y轴坐标（相对于left，top）
     var dx = 0,dy = 0;      //对话框坐标（同上）
     var isDraging = false;      //不可拖动
-//事件
+    //事件
     $('body').on('mousedown','.node',function(e){
         selectelement=$(this);
         selectnodenum=this.id.replace("node","");//获取node的id数字
         // console.log(Node.getnodebyId(getnodenum));
         selectnode=nodelist[selectnodenum];
-        console.log(nodelist[selectnodenum]);
+      //  console.log(nodelist[selectnodenum]);
 
         e = e || window.event;
         mx = e.pageX;     //点击时鼠标X坐标
@@ -180,6 +204,18 @@
             //selectelement.css({"left":moveX + 'px',"top":moveY + 'px'});
             Node.setnodeposition(selectnodenum,moveX.toFixed(0),moveY.toFixed(0));
             showattr(selectnode);
+            //
+            var nxtnum=nodelist[selectnodenum].nextnodes.length;
+            $("canvas[id*='"+nodelist[selectnodenum].id+"']").remove();
+            for(i=0;i<nxtnum;i++)
+            {
+               // var node_id=nodelist[selectnodenum].nextnodes[i];
+               // var id=nodelist[selectnodenum].nextnodes[i].replace("node","");
+               // var node=nodelist[nodelist[selectnodenum].nextnodes[i].replace("node","")];
+
+                link(nodelist[selectnodenum],nodelist[nodelist[selectnodenum].nextnodes[i].replace("node","")]);
+            }
+
         };
     });
 
@@ -190,7 +226,7 @@
         //update
 
     });
-//节点状态激活
+    //节点状态激活
     $('body').on('mousedown','#setactive',function() {
         Node.setnodeactive(selectnodenum,true);
         showattr(selectnode);
@@ -222,14 +258,76 @@
     });
     //连线
     $('body').on('mousedown','#link',function() {
-       link();
+        link();
     });
+    //下拉框显示
+    $('#collapseExample').on('show.bs.collapse', function () {
+        $("#nextnodes").empty();
+        var n=getnodelist();
+        htmltext="";
+        for(i=0;i<n;i++)
+        {
+            if(nodelist[i].id==nodelist[selectnodenum].id){;}
+            else{
+                var classname=nodelist[selectnodenum].nextnodes.indexOf(nodelist[i].id)>-1?"btn btn-secondary btn-sm":"btn btn-light btn-sm";
+                htmltext+="<button type=\"button\" class=\""+classname+"\" id=\"nextnode"+nodelist[i].id+"\">"+nodelist[i].id+"</button>";
+            }
+
+        }
+        $("#nextnodes").append(htmltext);
+    });
+    //选择节点
+    $('body').on('click','button[id^="nextnode"]',function() {
+        var isin=nodelist[selectnodenum].nextnodes.indexOf($(this).text());
+        console.log(isin+" "+$(this).text()+" in "+nodelist[selectnodenum].nextnodes);
+        var anotherisin=nodelist[$(this).text().replace("node","")].nextnodes.indexOf(nodelist[selectnodenum].id);
+        if(isin!=-1)
+        {
+            //remove
+
+            nodelist[selectnodenum].nextnodes.splice(isin, 1);
+            $(this).removeClass();
+            $(this).addClass("btn btn-light btn-sm");
+            destorylink(nodelist[selectnodenum],nodelist[$(this).text().replace("node","")]);
+            //关联节点
+            if(anotherisin!=-1)
+            {
+                //存在去除
+                nodelist[$(this).text().replace("node","")].nextnodes.splice(anotherisin,1);
+            }
+            else{
+                ;
+            }
+        }
+        else
+        {
+            //add
+            nodelist[selectnodenum].nextnodes.push($(this).text());
+            $(this).removeClass();
+            $(this).addClass("btn btn-secondary btn-sm");
+            link(nodelist[selectnodenum],nodelist[$(this).text().replace("node","")]);
+
+            //关联节点
+            if(anotherisin!=-1)
+            {
+                //存在不做
+                ;
+            }
+            else{
+                //不存在创建
+                nodelist[$(this).text().replace("node","")].nextnodes.push(nodelist[selectnodenum].id);
+            }
+
+        }
+
+    });
+
 
     //功能
     function create(type)
     {
-        var newnode=Node.createNew(type);
-        newnode.create();
+        selectnode=Node.createNew(type);
+        selectnode.create();
     }
     function changetype(nodenum,typevalue)
     {
@@ -256,6 +354,8 @@
         $("#type").val(node.type);
         //尺寸
         $("#elementsize").text("Width:"+node.size[0]+" Height:"+node.size[1]);
+    $("#collapseExample").collapse('hide')
+
     }
 
     function getcent(varnode)
@@ -265,26 +365,106 @@
         var top = varnode.position[1];
         var w=varnode.size[0];
         var h=varnode.size[1];
-        console.log("left:"+left+" top:"+top+" w: "+w+" h:"+h);
+       // console.log("left:"+left+" top:"+top+" w: "+w+" h:"+h);
         var centx=parseInt(left)+parseInt(w/2);
         var centy=parseInt(top)+parseInt(h/2);
-        console.log("x="+centx+" y="+centy);
+      //  console.log("x="+centx+" y="+centy);
         return cent=[centx,centy];
     }
-
-    function link()
+    //obj2[x,y]位于obj1[x,y]的哪个方位
+    //       |
+    //   2   |    1
+    //       |
+    //-----—obj1------
+    //       |
+    //   3   |    4
+    //       |
+    function objDirect(obj1,obj2)
     {
-        $("#link"+nodelist[0].id+nodelist[1].id).remove();
-        var p1=getcent(nodelist[0]);
-        var p2=getcent(nodelist[1]);
+        var direct=0;
+        var x=obj2[0]>obj1[0]?3:(obj2[0]<obj1[0]?4:1);
+        var y=obj2[1]>obj1[1]?1:(obj2[1]<obj1[1]?2:-1);
+
+        switch (x*y) {
+            case 3: direct= 4;break;//网页坐标向下变大
+            case 4: direct= 3;break;
+            case 6: direct= 1;break;
+            case 8: direct= 2;break;
+
+            case 1: direct= 34;break;//下
+            case 2: direct= 12;break;//上
+            case -3: direct= 14;break;//右
+            case -4: direct= 23;break;//左
+            case -1: direct= 0;break;//O
+            default: break;
+        }
+        return direct;
+    }
+    //检查节点
+    function getnodelist()
+    {
+       // console.log(nodelist.length);
+        return nodelist.length;
+    }
+    //连线
+    function link(node0,node1)
+    {
+        $("#canvas"+node0.id+node1.id).remove();
+
+        //$("canvas[id*='"+node0.id+"']").remove();
+        var p1=getcent(node0);
+        var p2=getcent(node1);
         var left=p1[0]>p2[0]?p2[0]:p1[0];
         left+=16;
         var top=p1[1]>p2[1]?p2[1]:p1[1];
         top+=8;
         var w=Math.abs(p1[0]-p2[0]);
         var h=Math.abs(p1[1]-p2[1]);
-        var htmltext="<div id=\"link"+nodelist[0].id+nodelist[1].id+"\" style=\"position: absolute;top:"+top+"px;left:"+left+"px;width:"+w+"px;height:"+h+"px; background-color:rgba(204,204,204,0.1);border-color:#3366ff #3366ff transparent transparent;border-style:solid solid dashed dashed;z-index: 0\"></div>";
-        $("#background").append(htmltext);
+        //var htmltext="<canvas id=\"canvas"+nodelist[0].id+nodelist[1].id+"\" width=\""+w+"\" height=\""+h+"\" style=\"position: absolute;top:"+top+"px;left:"+left+"px;z-index: 0\"/>";
+        //$("#background").append(htmltext);
+
+        var bkg = document.getElementById('background');
+        var canvas = document.createElement('canvas');
+        bkg.appendChild(canvas);
+        canvas.id="canvas"+node0.id+node1.id;
+        canvas.style.width = w>0?w:1 + "px";
+        canvas.style.height = h>0?h:1 + "px";
+        canvas.width = (w>0?w:1)*2; //
+        canvas.height = (h>0?h:1)*2;
+        canvas.style.zIndex = 0;
+        canvas.style.position = "absolute";
+        canvas.style.left=left+"px";
+        canvas.style.top = top+"px";
+        //canvas.style.backgroundColor = '#FF0000';
+        var context = canvas.getContext('2d');
+        context.fillStyle = 'rgba(255, 255, 255, 0)';
+        context.strokeStyle = "#ff0000";
+        context.lineWidth = 1;
+        context.clearRect(0, 0, w, h);
+        var direct=objDirect(p1,p2);
+        context.beginPath();
+        //console.log(direct);
+
+            switch (direct) {
+                case 4: context.moveTo(0.5,0.5);context.lineTo(w+0.5,h+0.5);break;//网页坐标向下变大
+                case 3: context.moveTo(w+0.5,0.5);context.lineTo(0.5,h+0.5);break;
+                case 1: context.moveTo(w+0.5,0.5);context.lineTo(0.5,h+0.5);break;
+                case 2: context.moveTo(0.5,0.5);context.lineTo(w+0.5,h+0.5);break;
+
+                case 34: context.moveTo(0.5,0.5);context.lineTo(0.5,h+0.5);break;//下
+                case 12: context.moveTo(0.5,0.5);context.lineTo(0.5,h+0.5);break;//上
+                case 14: context.moveTo(0.5,0.5);context.lineTo(w+0.5,0.5);break;//右
+                case 23: context.moveTo(0.5,0.5);context.lineTo(w+0.5,0.5);break;//左
+                case 0: context.moveTo(0.5,0.5);context.lineTo(0.5,0.5);break;//O
+                default: break;
+            }
+        context.closePath();
+        context.stroke();
+        context.scale(0.5,0.5);
+    }
+    function destorylink(node0,node1)
+    {
+        $("#canvas"+node0.id+node1.id).remove();
     }
 </script>
 </body>
