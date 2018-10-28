@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="row" >
-    <div class="col-md-9" id="background" style="min-height: 500px;background-color: #cccccc;"></div>
+    <div class="col-md-9" id="background" style="min-height: 500px;background-color: #eeeeee;"></div>
     <div class="col-md-3">
         <table class="table table-bordered table-condensed" style="font-size: 13px;">
             <tr>
@@ -105,7 +105,7 @@
             var node={};
             node.id="node"+nodenum;
             node.name="node"+nodenum;
-            node.active=false;
+            node.active=true;
             node.position=[0,0];
             node.size=[0,0];
             node.content=node.id;
@@ -113,7 +113,7 @@
             var types=["primary","secondary","success","danger","warning","info","light","dark"];
             node.type=types[type];
             node.create=function(){
-                var htmltext="<div id="+node.id+"  class=\"btn btn-lg btn-outline-"+node.type+" node\" style=\" z-index:"+parseInt(nodenum+1)+"\">"+node.content+"</div>";
+                var htmltext="<div id="+node.id+"  class=\"btn btn-lg btn-outline-"+node.type+" node active\" style=\" z-index:"+parseInt(nodenum+1)+"\">"+node.content+"</div>";
                 $("#background").append(htmltext);
                 node.size[0] = parseInt($("#"+node.id).width());
                 node.size[1] = parseInt($("#"+node.id).height());
@@ -427,40 +427,43 @@
         var canvas = document.createElement('canvas');
         bkg.appendChild(canvas);
         canvas.id="canvas"+node0.id+node1.id;
-        canvas.style.width = w>0?w:1 + "px";
-        canvas.style.height = h>0?h:1 + "px";
-        canvas.width = (w>0?w:1)*2; //
-        canvas.height = (h>0?h:1)*2;
+
         canvas.style.zIndex = 0;
         canvas.style.position = "absolute";
         canvas.style.left=left+"px";
         canvas.style.top = top+"px";
         //canvas.style.backgroundColor = '#FF0000';
         var context = canvas.getContext('2d');
+        canvas.getContext('2d').imageSmoothingEnabled = true;
+        canvas.width = (w>5?w:5)*window.devicePixelRatio; //
+        canvas.height = (h>5?h:5)*window.devicePixelRatio;
+        context.scale(window.devicePixelRatio, window.devicePixelRatio);
         context.fillStyle = 'rgba(255, 255, 255, 0)';
-        context.strokeStyle = "#ff0000";
-        context.lineWidth = 1;
-        context.clearRect(0, 0, w, h);
+        context.strokeStyle = "#00aaee";
+        context.lineWidth=2;
         var direct=objDirect(p1,p2);
+
         context.beginPath();
+
         //console.log(direct);
 
-            switch (direct) {
-                case 4: context.moveTo(0.5,0.5);context.lineTo(w+0.5,h+0.5);break;//网页坐标向下变大
-                case 3: context.moveTo(w+0.5,0.5);context.lineTo(0.5,h+0.5);break;
-                case 1: context.moveTo(w+0.5,0.5);context.lineTo(0.5,h+0.5);break;
-                case 2: context.moveTo(0.5,0.5);context.lineTo(w+0.5,h+0.5);break;
+        switch (direct) {
+            case 4: context.moveTo(0,0);context.lineTo(w,h);break;//网页坐标向下变大
+            case 3: context.moveTo(w,0);context.lineTo(0,h);break;
+            case 1: context.moveTo(w,0);context.lineTo(0,h);break;
+            case 2: context.moveTo(0,0);context.lineTo(w,h);break;
 
-                case 34: context.moveTo(0.5,0.5);context.lineTo(0.5,h+0.5);break;//下
-                case 12: context.moveTo(0.5,0.5);context.lineTo(0.5,h+0.5);break;//上
-                case 14: context.moveTo(0.5,0.5);context.lineTo(w+0.5,0.5);break;//右
-                case 23: context.moveTo(0.5,0.5);context.lineTo(w+0.5,0.5);break;//左
-                case 0: context.moveTo(0.5,0.5);context.lineTo(0.5,0.5);break;//O
-                default: break;
-            }
+            case 34: context.moveTo(0.5,0);context.lineTo(0.5,h);break;//下
+            case 12: context.moveTo(0.5,0);context.lineTo(0.5,h);break;//上
+            case 14: context.moveTo(0,0.5);context.lineTo(w,0.5);break;//右
+            case 23: context.moveTo(0,0.5);context.lineTo(w,0.5);break;//左
+            case 0: context.moveTo(0,0);context.lineTo(0,0);break;//O
+            default: break;
+        }
         context.closePath();
         context.stroke();
-        context.scale(0.5,0.5);
+
+
     }
     function destorylink(node0,node1)
     {
