@@ -5,6 +5,7 @@
     <title>Title</title>
     <style>
         .node {position: absolute;}
+        .node:hover{box-shadow: darkgrey 0px 0px 20px 5px ;}
     </style>
     <script src="js/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -76,10 +77,6 @@
 
                             </div>
 
-
-
-
-
                 </td>
             </tr>
         </table>
@@ -90,7 +87,7 @@
     <button id="createnode" class="btn btn-sm btn-primary">添加节点</button>
     <button class="btn btn-sm btn-primary" onclick="alert(nodelist.length)">节点个数</button>
     <button id="getcent_btn" class="btn btn-sm btn-primary">节点位置</button>
-    <button id="link" class="btn btn-sm btn-primary">连接</button>
+
 </div>
 <script src="js/bootstrap.min.js"></script>
 <script>
@@ -166,7 +163,18 @@
     var isDraging = false;      //不可拖动
     //事件
     $('body').on('mousedown','.node',function(e){
+        //恢复原先的连线颜色
+        if(selectnodenum!=null){
+            destorylinks(nodelist[selectnodenum]);//清空原先话的
+            var linknodes=nodelist[selectnodenum].nextnodes;
+            for(i=0;i<linknodes.length;i++)
+            {
+                link(nodelist[selectnodenum],nodelist[nodelist[selectnodenum].nextnodes[i].replace("node","")],"#00aaee");
+            }
+        }
+        //
         selectelement=$(this);
+
         selectnodenum=this.id.replace("node","");//获取node的id数字
         // console.log(Node.getnodebyId(getnodenum));
         selectnode=nodelist[selectnodenum];
@@ -182,6 +190,17 @@
         $('.state').text("true");
         //侧边栏显示数据
         showattr(selectnode);
+
+    });
+    //鼠标连线显示
+    $('body').on('mouseup','.node',function(e){
+        //选择相关连线
+        destorylinks(nodelist[selectnodenum]);//清空原先话的
+        var linknodes=nodelist[selectnodenum].nextnodes;
+        for(i=0;i<linknodes.length;i++)
+        {
+            link(nodelist[selectnodenum],nodelist[nodelist[selectnodenum].nextnodes[i].replace("node","")],"red");
+        }
     });
 
     $('body').on('mousemove','#background',function(e) {
@@ -407,7 +426,7 @@
         return nodelist.length;
     }
     //连线
-    function link(node0,node1)
+    function link(node0,node1,linecolor="#00aaee")
     {
         $("#canvas"+node0.id+node1.id).remove();
 
@@ -435,11 +454,11 @@
         //canvas.style.backgroundColor = '#FF0000';
         var context = canvas.getContext('2d');
         canvas.getContext('2d').imageSmoothingEnabled = true;
-        canvas.width = (w>5?w:5)*window.devicePixelRatio; //
-        canvas.height = (h>5?h:5)*window.devicePixelRatio;
+        canvas.width = (w>15?w:15)*window.devicePixelRatio; //
+        canvas.height = (h>15?h:15)*window.devicePixelRatio;
         context.scale(window.devicePixelRatio, window.devicePixelRatio);
         context.fillStyle = 'rgba(255, 255, 255, 0)';
-        context.strokeStyle = "#00aaee";
+        context.strokeStyle = linecolor;
         context.lineWidth=2;
         var direct=objDirect(p1,p2);
 
@@ -468,6 +487,11 @@
     function destorylink(node0,node1)
     {
         $("#canvas"+node0.id+node1.id).remove();
+    }
+
+    function destorylinks(node0)
+    {
+        $("canvas[id*='"+node0.id+"']").remove();
     }
 </script>
 </body>
