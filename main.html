@@ -16,10 +16,10 @@
     <div class="col-md-3">
         <table class="table table-bordered table-condensed" style="font-size: 13px;">
             <tr>
-                <td style="width:60px;padding: 5;"><strong>NodeID</strong></td><td><span id="elementid"></span></td>
+                <td style="width:60px;padding:5px;"><strong>NodeID</strong></td><td><span id="elementid"></span></td>
             </tr>
             <tr>
-                <td style="width:60px;padding: 5;"><strong>名称</strong></td>
+                <td style="width:60px;padding:5px;"><strong>名称</strong></td>
                 <td>
                     <div class="input-group input-group-sm mb-1">
                         <input id="elementname" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
@@ -30,11 +30,11 @@
                 </td>
             </tr>
             <tr>
-                <td style="width:60px;padding: 5;"><strong>位置</strong></td>
+                <td style="width:60px;padding: 5px;"><strong>位置</strong></td>
                 <td><span id="elementpos"></span></td>
             </tr>
             <tr>
-                <td style="width:60px;padding: 5;"><strong>状态</strong></td>
+                <td style="width:60px;padding: 5px;"><strong>状态</strong></td>
                 <td>
                 <strong id="elementstatus">NULL</strong>
                     <button class="btn btn-sm btn-primary" id="setactive">Active</button>
@@ -42,7 +42,7 @@
                 </td>
             </tr>
             <tr>
-                <td style="width:60px;padding: 5;"><strong>类型</strong></td>
+                <td style="width:60px;padding: 5px;"><strong>类型</strong></td>
                 <td>
                     <select id="type" class="form-control" style="font-size: 13px;">
                         <option value="-1">Null</option>
@@ -58,11 +58,11 @@
                 </td>
             </tr>
             <tr>
-                <td style="width:60px;padding: 5;"><strong>尺寸</strong></td>
+                <td style="width:60px;padding: 5px;"><strong>尺寸</strong></td>
                 <td><span id="elementsize">Width:NULL height:NULL</span></td>
             </tr>
             <tr>
-                <td style="width:60px;padding: 5;"><strong>下节点</strong></td>
+                <td style="width:60px;padding: 5px;"><strong>下节点</strong></td>
                 <td>
 
                             <button id="shownextnodes" class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
@@ -225,7 +225,7 @@
             showattr(selectnode);
             //
             var nxtnum=nodelist[selectnodenum].nextnodes.length;
-            $("canvas[id*='"+nodelist[selectnodenum].id+"']").remove();
+            $("canvas[id*='"+nodelist[selectnodenum].id+"_']").remove();
             for(i=0;i<nxtnum;i++)
             {
                // var node_id=nodelist[selectnodenum].nextnodes[i];
@@ -428,8 +428,8 @@
     //连线
     function link(node0,node1,linecolor="#00aaee")
     {
-        $("#canvas"+node0.id+node1.id).remove();
-
+        $("#canvas"+node0.id+"_"+node1.id+"_").remove();
+        $("#canvas"+node1.id+"_"+node0.id+"_").remove();
         //$("canvas[id*='"+node0.id+"']").remove();
         var p1=getcent(node0);
         var p2=getcent(node1);
@@ -445,7 +445,7 @@
         var bkg = document.getElementById('background');
         var canvas = document.createElement('canvas');
         bkg.appendChild(canvas);
-        canvas.id="canvas"+node0.id+node1.id;
+        canvas.id="canvas"+node0.id+"_"+node1.id+"_";
 
         canvas.style.zIndex = 0;
         canvas.style.position = "absolute";
@@ -486,12 +486,13 @@
     }
     function destorylink(node0,node1)
     {
-        $("#canvas"+node0.id+node1.id).remove();
+        $("#canvas"+node0.id+"_"+node1.id+"_").remove();
+        $("#canvas"+node1.id+"_"+node0.id+"_").remove();
     }
 
     function destorylinks(node0)
     {
-        $("canvas[id*='"+node0.id+"']").remove();
+        $("canvas[id*='"+node0.id+"_']").remove();
     }
 </script>
 </body>
