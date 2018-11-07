@@ -5,7 +5,7 @@
     <title>Title</title>
     <style>
         .node {position: absolute;}
-        .node:hover{box-shadow: darkgrey 0px 0px 20px 5px ;}
+        .node:hover{box-shadow: darkgrey 0px 0px 20px 5px;}
     </style>
     <script src="js/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -237,7 +237,15 @@
 
         };
     });
-
+    //鼠标移动到元素时，元素置顶
+        var temp_zindex=0;
+        $('body').on('mouseover','.node',function() {
+            temp_zindex=$(this).css("z-index");
+            $(this).css("z-index",999);
+        }).on('mouseout','.node',function() {
+        $(this).css("z-index",temp_zindex);
+        });
+    //
     $('body').on('mouseup','.row',function(){
         //selectelement=$(this);
         isDraging = false;
